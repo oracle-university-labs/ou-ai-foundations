@@ -18,7 +18,7 @@ echo "===== Starting Cloud-Init Script ====="
 # Enable ol8_addons and install necessary development tools
 echo "Installing required packages..."
 sudo dnf config-manager --set-enabled ol8_addons
-sudo dnf install -y git libffi-devel bzip2-devel ncurses-devel readline-devel wget make gcc zlib-devel openssl-devel
+sudo dnf install -y git libffi-devel bzip2-devel ncurses-devel readline-devel wget make gcc zlib-devel openssl-devel patch
 
 # Install the latest SQLite from source
 echo "Installing latest SQLite..."
