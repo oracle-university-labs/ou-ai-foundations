@@ -140,6 +140,43 @@ rm -rf .git labs
 
 echo "Files successfully downloaded to $FINAL_DIR"
 
+# ============================================================
+# SECURITY HARDENING: Configure JupyterLab
+# - Bind to 127.0.0.1 only (not accessible from public internet)
+# - Require token authentication
+# - Students access via SSH tunnel:
+#   ssh -i <key> -L 8888:localhost:8888 opc@<public-ip>
+#   then open http://localhost:8888?token=<token> in browser
+# ============================================================
+echo "Configuring JupyterLab with token authentication (localhost only)..."
+JUPYTER_TOKEN=$(openssl rand -hex 24)
+mkdir -p $HOME/.jupyter
+cat > $HOME/.jupyter/jupyter_lab_config.py <<JCFG
+c.ServerApp.ip = '127.0.0.1'
+c.ServerApp.port = 8888
+c.ServerApp.open_browser = False
+c.ServerApp.token = '${JUPYTER_TOKEN}'
+c.ServerApp.allow_remote_access = False
+JCFG
+
+# Save the token for the student to retrieve once SSH into
+echo "============================================" > $HOME/jupyter_access.txt
+echo "JupyterLab Access Instructions" >> $HOME/jupyter_access.txt
+echo "============================================" >> $HOME/jupyter_access.txt
+echo "" >> $HOME/jupyter_access.txt
+echo "1. From your LOCAL machine, open a terminal and run:" >> $HOME/jupyter_access.txt
+echo "   ssh -i <private_key> -L 8888:localhost:8888 -L 8501:localhost:8501 opc@<public-ip>" >> $HOME/jupyter_access.txt
+echo "" >> $HOME/jupyter_access.txt
+echo "2. Then open this URL in your browser:" >> $HOME/jupyter_access.txt
+echo "   http://localhost:8888?token=${JUPYTER_TOKEN}" >> $HOME/jupyter_access.txt
+echo "3. Then open this Streamlit URL in your browser, when on last lab:" >> $HOME/jupyter_access.txt
+echo "   http://127.0.0.1:8501" >> $HOME/jupyter_access.txt
+echo "" >> $HOME/jupyter_access.txt
+echo "Your Jupyter token: ${JUPYTER_TOKEN}" >> $HOME/jupyter_access.txt
+echo "============================================" >> $HOME/jupyter_access.txt
+chmod 600 $HOME/jupyter_access.txt
+echo "Jupyter token saved to ~/jupyter_access.txt"
+
 EOF_OPC
 
 # Create the marker file to indicate the script has been run
